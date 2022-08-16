@@ -19,7 +19,8 @@ function App() {
     
   ]);
 
-const [formData, setFormData] = useState({
+const [isUpdate, setIsUpdate] = useState({ id: null, status:false});
+const [formData, setFormData] = useState({  
   name: "",
   telp: "",
 });
@@ -31,6 +32,7 @@ function handleChange(e) {
 function handleSubmit(e) {
   e.preventDefault();
   alert("Simpan data kontak?");
+  let data = [...contacts];
 
   if (formData.name === ""){
     return false;
@@ -38,13 +40,27 @@ function handleSubmit(e) {
   if (formData.telp === ""){
     return false;
   }
-
+  if (isUpdate.status){
+    data.forEach((contact) => {
+      if (contact.id === isUpdate.id){
+        contact.name = formData.name;
+        contact.telp = formData.telp;
+      }
+    });
+  } else {
+    data.push({ id: uid(), name: formData.name, telp : formData.telp});
+  }
   //Tambah Data contact
-  let data = [...contacts];
-
-  data.push({ id: uid(), name: formData.name, telp : formData.telp});
   setContacts(data);
+  setFormData({ name: "", telp: ""});
 }
+  function handleEdit(id) {
+    let data = [...contacts];
+    let foundData = data.find((contact) => contact.id === id);
+    setFormData({name: foundData.name, telp: foundData.telp});
+    setIsUpdate({ id: id, status: true});
+  }
+
   return (
     <div className="App">
       <h1 className="px-3 py -3"> Daftar Kontak Saya</h1>
@@ -71,9 +87,9 @@ function handleSubmit(e) {
           <button type="submit" clasName="btn btn-primary w-100 mt-3">Save</button>
         </div>
       </form>
-      <List data={contacts} />
+      <List handleEdit={handleEdit} data={contacts} />
     </div>
-  );
+  ); 
 }
 
 export default App;
